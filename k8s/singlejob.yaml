@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: single-job
+  namespace: myapps
+spec:
+  parallelism: 1
+  activeDeadlineSeconds: 900
+  template:
+    spec:
+      containers:
+        - name: mysql-dumper
+          image: 192.168.4.30:5000/mysql-dumper:latest
+          imagePullPolicy: Always
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-backup
+                  key: AWS_ACCESS_KEY
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-backup
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_DEFAULT_REGION
+              value: eu-west-3
+            - name: AWS_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-backup
+                  key: AWS_BUCKET_NAME
+            - name: TARGET_DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: database-config
+                  key: hostname
+            - name: TARGET_DATABASE_NAMES
+              valueFrom:
+                configMapKeyRef:
+                  name: database-config
+                  key: databases
+            - name: TARGET_DATABASE_USER
+              value: root
+            - name: TARGET_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-password
+                  key: mysql.root.password
+      restartPolicy: Never
