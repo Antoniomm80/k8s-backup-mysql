@@ -47,4 +47,18 @@ spec:
                 secretKeyRef:
                   name: mysql-root-password
                   key: mysql.root.password
+            - name: NOTIFY_ENABLED
+              value: "true"
+            - name: NOTIFICATION_PROVIDER
+              value: Telegram
+            - name: TELEGRAM_BOT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: telegram-credentials
+                  key: telegram-bot-api-key
+            - name: TELEGRAM_CHAT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: telegram-credentials
+                  key: telegram-chat-id
       restartPolicy: Never
